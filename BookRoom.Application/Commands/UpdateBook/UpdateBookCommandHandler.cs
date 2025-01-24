@@ -19,20 +19,10 @@ public class UpdateBookCommandHandler : IRequestHandler<UpdateBookCommand,Unit>
 
         book.Update(request.Title,request.Author,request.ISBN,request.YearPublication);
 
+        if (book == null)
+            throw new Exception("Book not found!");
+
         await _unitOfWork.BookRepository.UpdateBookAsync(book);
-
-        if (request.AddedQuantity != 0)
-        {
-            book.IncreaseOnHand(request.AddedQuantity);
-
-            await _unitOfWork.BookRepository.UpdateBookAsync(book);
-        }
-        else if (request.DecreseadQuantity != 0 || book.OnHand > 0)
-        {
-            book.DecreaseOnHand(request.DecreseadQuantity);
-
-            await _unitOfWork.BookRepository.UpdateBookAsync(book);
-        }
 
         await _unitOfWork.CompleteAsync();
 

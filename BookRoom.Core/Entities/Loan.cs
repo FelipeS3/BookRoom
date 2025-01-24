@@ -1,4 +1,7 @@
-﻿namespace BookRoom.Core.Entities;
+﻿using System.ComponentModel;
+using System.Text.Json.Serialization;
+
+namespace BookRoom.Core.Entities;
 
 public class Loan : BaseEntity
 {
@@ -9,7 +12,6 @@ public class Loan : BaseEntity
 
         LoanedQuantity = 1;
         LoanDate = DateTime.Now;
-        ReturnedDate = null;
     }
 
     public int IdUser { get; private set; }
@@ -21,9 +23,9 @@ public class Loan : BaseEntity
     public DateTime ExpectedReturnDate { get; private set; }
     public DateTime? ReturnedDate { get; private set; }
 
-    public void ExpectedReturnedDate(int numberLoanDay)
+    public void SetExpectedReturnDate(int loanDays)
     {
-        ExpectedReturnDate = LoanDate.AddDays(numberLoanDay);
+        ExpectedReturnDate = DateTime.UtcNow.AddDays(loanDays);
     }
 
     public void RenewLoan(int renew)

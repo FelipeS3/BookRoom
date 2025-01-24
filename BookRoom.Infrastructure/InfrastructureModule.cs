@@ -1,4 +1,6 @@
-﻿using BookRoom.Core.Repositories;
+﻿using System.ComponentModel;
+using System.Text.Json.Serialization;
+using BookRoom.Core.Repositories;
 using BookRoom.Infrastructure.Persistence;
 using BookRoom.Infrastructure.Persistence.Repositories;
 using Microsoft.EntityFrameworkCore;
@@ -9,7 +11,7 @@ namespace BookRoom.Infrastructure;
 
 public static class ApplicationModule
 {
-    public static IServiceCollection AddApplication(this IServiceCollection services, IConfiguration configuration)
+    public static IServiceCollection AddInfrastructure(this IServiceCollection services, IConfiguration configuration)
     {
         services.AddRepositories()
             .AddDbContexts(configuration)
@@ -26,6 +28,7 @@ public static class ApplicationModule
 
         return services;
     }
+
     private static IServiceCollection AddDbContexts(this IServiceCollection services, IConfiguration configuration)
     {
         var connectionString = configuration.GetConnectionString("BookRoomCs");
@@ -41,4 +44,5 @@ public static class ApplicationModule
 
         return services;
     }
+
 }

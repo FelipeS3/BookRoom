@@ -16,37 +16,43 @@ public class CreateLoanCommandHandler : IRequestHandler<CreateLoanCommand, Unit>
     public async Task<Unit> Handle(CreateLoanCommand request, CancellationToken cancellationToken)
     {
         var book = await _unitOfWork.BookRepository.GetByIdAsync(request.IdBook);
-
         var user = await _unitOfWork.UserRepository.GetByIdAsync(request.IdUser);
+        var activeLoan = await _unitOfWork.LoanRepository.GetActiveLoanByUserAsync(request.IdUser);
 
-        if (user is null || book is null)
-            throw new Exception("User or book do not exist!");
-        
+        if (user is null)
+            throw new Exception($"User with ID {request.IdUser} does not exist.");
+
+        if (book is null)
+            throw new Exception($"Book with ID {request.IdBook} does not exist.");
+
 
         if (book.Status == BookStatusEnum.Unavailable)
             throw new ArgumentException("This book is unavailable for a loan.");
-        
-
-        if (request.LoanedQuantity > 1)
-            throw new Exception("Only one book can be borrowed!");
 
 
-        if (request.NumberLoanDay > 7)
-            throw new Exception("The number of loan days cannot exceed 7 days.");
+        if (book.OnHand <= 0)
+            throw new Exception("The book is out of stock.");
+
+
+        if (activeLoan != null)
+            throw new Exception("User already has an active loan.");
+
+
+        if (request.NumberLoanDay <= 0 || request.NumberLoanDay > 7)
+            throw new Exception("The number of loan days must be between 1 and 7.");
 
 
         var loan = new Loan(request.IdUser, request.IdBook);
-        loan.ExpectedReturnedDate(request.NumberLoanDay);
+        loan.SetExpectedReturnDate(request.NumberLoanDay);
 
         await _unitOfWork.BeginTransactionAsync();
 
         try
         {
-            // Adicionar empréstimo no repositório
             await _unitOfWork.LoanRepository.AddLoan(loan);
 
-            // Reduzir quantidade do livro
-            book.DecreaseOnHand(request.LoanedQuantity);
+            book.DecreaseOnHand(1);
+
             await _unitOfWork.BookRepository.UpdateBookAsync(book);
 
             await _unitOfWork.CompleteAsync();
@@ -54,6 +60,7 @@ public class CreateLoanCommandHandler : IRequestHandler<CreateLoanCommand, Unit>
         catch (Exception ex)
         {
             await _unitOfWork.RollbackAsync();
+            throw;
         }
         
         return Unit.Value;

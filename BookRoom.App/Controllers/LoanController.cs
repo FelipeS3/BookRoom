@@ -1,4 +1,11 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using System.Runtime.CompilerServices;
+using BookRoom.Application.Commands.CreateLoan;
+using BookRoom.Application.Commands.DeleteLoan;
+using BookRoom.Application.Commands.UpdateLoan;
+using BookRoom.Application.Queries.GetAllLoans;
+using BookRoom.Application.Queries.GetLoanById;
+using MediatR;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
 namespace BookRoom.App.Controllers
@@ -7,27 +14,56 @@ namespace BookRoom.App.Controllers
     [ApiController]
     public class LoanController : ControllerBase
     {
-        [HttpGet]
-        public IActionResult GetAll()
+        private readonly IMediator _mediator;
+        public LoanController(IMediator mediator)
         {
-            return Ok();
+            _mediator = mediator;
         }
-        [HttpGet("{id}")]
-        public IActionResult GetById(int id)
+
+        [HttpGet]
+        public async Task<IActionResult> GetAll()
         {
-            return Ok();
+            var getAllLoansQuery = new GetAllLoansQuery();
+
+            var loan = await _mediator.Send(getAllLoansQuery);
+
+            return Ok(loan);
+        }
+
+        [HttpGet("{id}")]
+        public async Task<IActionResult> GetById(int id)
+        {
+            var query = new GetLoanByIdQuery(id);
+
+            var loan = await _mediator.Send(query);
+
+            return Ok(loan);
         }
 
         [HttpPost]
-        public IActionResult Post()
+        public async Task<IActionResult> Post([FromBody] CreateLoanCommand command)
         {
-            return Ok();
+            await _mediator.Send(command);
+
+            return NoContent();
+        }
+
+        [HttpPut("{id}")]
+        public async Task<IActionResult> Put(int id, [FromBody] UpdateLoanCommand command)
+        {
+            await _mediator.Send(command);
+
+            return NoContent();
         }
 
         [HttpDelete("{id}")]
-        public IActionResult Delete(int id)
+        public async Task<IActionResult> Delete(int id)
         {
-            return Ok();
+            var command = new DeleteLoanCommand(id);
+
+            var loan = await _mediator.Send(command);
+
+            return NoContent();
         }
 
     }

@@ -1,4 +1,5 @@
-﻿using BookRoom.Core.Entities;
+﻿using System.Security.Cryptography.X509Certificates;
+using BookRoom.Core.Entities;
 using BookRoom.Core.Repositories;
 using Microsoft.EntityFrameworkCore;
 
@@ -22,7 +23,7 @@ public class LoanRepository : ILoanRepository
 
     public async Task<Loan> GetByIdAsync(int id)
     {
-        return await _context.Loans.FirstOrDefaultAsync(x => x.Id == id);
+        return await _context.Loans.AsNoTracking().SingleOrDefaultAsync(x => x.Id == id);
     }
 
     public async Task AddLoan(Loan loan)
@@ -32,7 +33,11 @@ public class LoanRepository : ILoanRepository
 
     public async Task UpdateLoan(Loan loan)
     {
-         _context.Loans.Update(loan);
-         await _context.SaveChangesAsync();
+        _context.Loans.Update(loan);
+    }
+
+    public async Task<Loan?> GetActiveLoanByUserAsync(int userId)
+    {
+        return await _context.Loans.FirstOrDefaultAsync(x => x.IdUser == userId && x.ReturnedDate == null);
     }
 }

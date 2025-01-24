@@ -7,18 +7,15 @@ namespace BookRoom.Application
     {
         public static IServiceCollection AddApplication(this IServiceCollection services)
         {
-            services.AddHandlers();
+            services.AddMediator();
 
             return services;
         }
 
-        private static IServiceCollection AddHandlers(this IServiceCollection services)
+        private static IServiceCollection AddMediator(this IServiceCollection services)
         {
-            services.AddMediatR(config =>
-                config.RegisterServicesFromAssemblyContaining<CreateBookCommand>());
-
+            services.AddMediatR(cfg => cfg.RegisterServicesFromAssembly(typeof(CreateBookCommand).Assembly));
             return services;
         }
-
     }
 }
