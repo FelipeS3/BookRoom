@@ -1,6 +1,6 @@
 BookRoom: Sistema de Empréstimos de Livros 📚
 
-BookRoom é uma solução de gerenciamento de empréstimos de livros, desenvolvida como um desafio da Next Wave Education do Luis Felipe. O sistema foi projetado para ser eficiente, escalável e de fácil manutenção. Abaixo estão as principais funcionalidades e tecnologias utilizadas.
+BookRoom é uma solução de gerenciamento de empréstimos de livros, O sistema foi projetado para ser eficiente, escalável e de fácil manutenção. Abaixo estão as principais funcionalidades e tecnologias utilizadas.
 Funcionalidades:
 Empréstimo de Livros:
 
